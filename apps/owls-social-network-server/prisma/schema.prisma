@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Reaction {
+  appUser   AppUser? @relation(fields: [appUserId], references: [id])
+  appUserId String?
+  createdAt DateTime @default(now())
+  hoot      Hoot?    @relation(fields: [hootId], references: [id])
+  hootId    String?
+  id        String   @id @default(cuid())
+  typeField String?
+  updatedAt DateTime @updatedAt
+}
+
+model Hoot {
+  appUser   AppUser?   @relation(fields: [appUserId], references: [id])
+  appUserId String?
+  comments  Comment[]
+  content   String?
+  createdAt DateTime   @default(now())
+  id        String     @id @default(cuid())
+  reactions Reaction[]
+  updatedAt DateTime   @updatedAt
+}
+
+model Comment {
+  appUser         AppUser? @relation(fields: [appUserId], references: [id])
+  appUserId       String?
+  content         String?
+  createdAt       DateTime @default(now())
+  hoot            Hoot?    @relation(fields: [hootId], references: [id])
+  hootId          String?
+  id              String   @id @default(cuid())
+  parentCommentId Int?
+  updatedAt       DateTime @updatedAt
+}
+
+model Follow {
+  createdAt DateTime @default(now())
+  follower  String?
+  following String?
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model AppUser {
+  comments  Comment[]
+  createdAt DateTime   @default(now())
+  email     String?
+  hoots     Hoot[]
+  id        String     @id @default(cuid())
+  password  String?
+  reactions Reaction[]
+  updatedAt DateTime   @updatedAt
+  username  String?
+}
